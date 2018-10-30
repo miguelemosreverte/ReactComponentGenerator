@@ -1,11 +1,11 @@
 #!/bin/bash
 
 name=$1
-path=$2
+path_input=$2
 type=$3
 props_input=$4
 
-
+path="../$path_input"
 
 temp=${name:0:1}
 componentName="${temp^^}"
