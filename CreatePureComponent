@@ -5,15 +5,9 @@ className=$2
 props=$3
 proptypes=$4
 path=$5
-exist_props=$6
 
-echo "Arguments3 $3"
-
-echo "proptypes $proptypes"
-echo "props $props"
-
-echo "import React,{ Component } from 'react';
-import styles from './$componentName.sccs';
+echo "import React,{ PureComponent } from 'react';
+import styles from './$componentName.scss';
 import classNames from 'classnames/bind';" >> $path/$componentName/$componentName.js
 
 if [ ! -z "$props" ]
@@ -24,7 +18,7 @@ fi
 
 echo "const cx = classNames.bind(styles);
 
-class $componentName extends Component {
+class $componentName extends PureComponent {
 
     constructor(props) {
         super(props);
@@ -41,7 +35,7 @@ class $componentName extends Component {
     render() {" >> $path/$componentName/$componentName.js
 if [ ! -z "$props" ]
 then
-    echo "        const {$props} = this.props;" >> $path/$componentName/$componentName.js
+    echo "      const {$props} = this.props;" >> $path/$componentName/$componentName.js
 fi   
         
  echo "

@@ -1,0 +1,110 @@
+#!/bin/bash
+
+name=$1
+
+if [ "$name" = "-h" ] || [ "$name" = "--help" ] ; then
+    echo "
+        ReactComponentGenerator usage:
+
+        Parameter 1 : name
+            Insert the name of the component in lowercase splited by '-'. Then the script will translate the name in camel case format.
+        Paramater 2: path
+            This will be the path where the component folder will be generated. If the path does not exist, the script will not continue its execution.
+        Parameter 3:  type
+            React Component type structure to be created. Below the three different possibilities:
+                1) class
+                2) stateless
+                3) pure
+        Parameter 4: props
+            If the component will receive props then the script will include them in the react component definition and also it will import and implement PropType checkings.
+            Each prop must be splited by comma ','
+            Format : <Prop Name>#<Type>
+            Examples: age#Number,name#String.isRequired,incrementAge#Function.isRequired
+    "
+    exit 0
+fi
+
+path_input=$2
+type=$3
+props_input=$4
+
+path="$path_input"
+
+
+
+temp=${name:0:1}
+componentName="${temp^^}"
+flag=false
+for (( i=1; i<${#name}; i++ )); do
+
+    if [ "$flag" = true ]
+    then
+        flag=false
+        temp=${name:$i:1}
+        componentName+="${temp^^}"
+        continue
+    fi
+
+    if [ "${name:$i:1}" != "-" ]
+    then
+        temp=${name:$i:1}
+        componentName+="${temp}"
+        
+    else  
+        flag=true
+        continue
+    fi
+
+done
+
+if [  ! -d "$path" ]; then
+     echo $"ERROR: Source path  $path does not exist"
+     exit 1 
+fi
+
+if [ ! -d "$path/$componentName" ]; then
+  mkdir $path/$componentName
+  
+else 
+    echo $"Error, there is an existing structure folder for $componentName"
+     exit 1   
+fi
+
+
+proptypes_array=(`echo $props_input | sed 's/,/\n/g'`)
+proptypes="$componentName.propTypes = {"
+for prop_line in "${proptypes_array[@]}"
+do
+  prop=(`echo $prop_line | sed 's/\#/\n/g'`)
+  props_tmp+=" ${prop[0]} ,"
+  proptypes_tmp+="
+  ${prop[0]}: PropTypes.${prop[1]},"
+done
+props=${props_tmp::-1}
+proptypes+=${proptypes_tmp::-1}
+proptypes+="
+};"
+
+
+
+case "$type" in
+        class)
+             bash CreateClassComponent $componentName $name "$props" "$proptypes" $path 
+            ;;
+         
+        stateless)
+            bash CreateStatelessComponent $componentName $name "$props" "$proptypes" $path 
+            ;;
+         
+        pure)
+            bash CreatePureComponent $componentName $name "$props" "$proptypes" $path 
+            ;;         
+        *)
+            echo $"Usage: $0 {class|stateless|pure}"
+            exit 1
+esac
+
+bash CreateSCCSFile $componentName $name $path
+bash CreateTestFile $componentName $path
+bash CreateIndex $componentName $path
+echo "Component structure $componentName has been created."

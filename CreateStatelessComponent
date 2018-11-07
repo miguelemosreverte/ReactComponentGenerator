@@ -6,11 +6,9 @@ props=$3
 proptypes=$4
 path=$5
 
-echo "proptypes $proptypes"
-echo "props $props"
 
 echo "import React from 'react';
-import styles from './$componentName.sccs';
+import styles from './$componentName.scss';
 import classNames from 'classnames/bind';" >> $path/$componentName/$componentName.js
 if [ ! -z "$props" ]
 then
