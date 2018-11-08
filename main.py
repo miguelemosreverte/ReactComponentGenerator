@@ -18,10 +18,22 @@ def create_template(header, body, footer):
         """
 
 
-def imports(component_name, props, component_type):
+def imports(param):
+    '''
+    Here we use both dict.get('key name') as dict['key name']
+
+    dict.get('key name') is used to maybe find a value, can return None
+
+    dict['key name'] is made under the assumption that the key exist.
+    dict['key name'] will runtime exception if the key is not found.
+    '''
+    component_type = param.get("component_type") # key may not exist
+    component_name = param["component_name"]
+    props = param["props"]
+    deestructuring = ",{"+component_type+"}" if component_type else ""
     return \
         """ 
-        import React,{ """ + component_type + """ } from 'react';
+        import React""" + deestructuring + """ } from 'react';
         import styles from './""" + component_name + """.scss';
         import classNames from 'classnames/bind';
         """ \
@@ -33,7 +45,10 @@ def imports(component_name, props, component_type):
         """
 
 
-def stateless(component_name, props, class_name, component_type):
+def stateless(param):
+    class_name = param["class_name"]
+    component_name = param["component_name"]
+    props = param["props"]
     '''
     Here we see triple braces in use:
     Two of them together represent a single brace not used for interpolation sintax.
@@ -47,7 +62,11 @@ def stateless(component_name, props, class_name, component_type):
             </div>
         );"""
 
-def component(component_name, props, class_name, component_type):
+def component(param):
+    class_name = param["class_name"]
+    component_name = param["component_name"]
+    component_type = param["component_type"]
+    props = param["props"]
     return \
         """
     
@@ -82,7 +101,10 @@ def component(component_name, props, class_name, component_type):
         """
 
 
-def prop_types_and_export(component_name, props, prop_types):
+def prop_types_and_export(param):
+    component_name = param["component_name"]
+    props = param["props"]
+    prop_types = param["prop_types"]
     return \
         f"""
         {prop_types if props else ""}
@@ -92,59 +114,39 @@ def prop_types_and_export(component_name, props, prop_types):
         """
 
 
-def create_class_component(
-    component_name
-    , class_name
-    , props
-    , prop_types
-    , component_type
-): return create_template(
-    header=imports(component_name, props, component_type)
-    , body=component(component_name, props, class_name, component_type)
-    , footer=prop_types_and_export(component_name, props, prop_types)
+def create_class_component(param):
+    return \
+    create_template(
+    header=imports(param)
+    , body=component(param)
+    , footer=prop_types_and_export(param)
 )
 
 
-def create_pure_component(
-        component_name
-        , class_name
-        , props
-        , prop_types
-):
-    component_type = "PureComponent"
+def create_pure_component(param):
+    param["component_type"] = "PureComponent"
     return \
     create_template(
-          header=imports(component_name, props, component_type)
-        , body=component(component_name, props, class_name, component_type)
-        , footer=prop_types_and_export(component_name, props, prop_types)
+          header=imports(param)
+        , body=component(param)
+        , footer=prop_types_and_export(param)
     )
 
-def create_standard_component(
-        component_name
-        , class_name
-        , props
-        , prop_types
-):
-    component_type = "Component"
+def create_standard_component(param):
+    param["component_type"] = "Component"
     return \
     create_template(
-          header=imports(component_name, props, component_type)
-        , body=component(component_name, props, class_name, component_type)
-        , footer=prop_types_and_export(component_name, props, prop_types)
+          header=imports(param)
+        , body=component(param)
+        , footer=prop_types_and_export(param)
     )
 
-def create_stateless_component(
-        component_name
-        , class_name
-        , props
-        , prop_types
-):
-    component_type = "Component"
+def create_stateless_component(param):
     return \
     create_template(
-          header=imports(component_name, props, component_type)
-        , body=stateless(component_name, props, class_name, component_type)
-        , footer=prop_types_and_export(component_name, props, prop_types)
+          header=imports(param)
+        , body=stateless(param)
+        , footer=prop_types_and_export(param)
     )
 
 def create_component(
@@ -152,7 +154,8 @@ def create_component(
         , class_name
         , props
         , prop_types
-): return create_class_component(
+): return \
+    create_class_component(
     component_name=component_name
     , class_name=class_name
     , props=props
@@ -161,10 +164,10 @@ def create_component(
 )
 
 
-output = create_stateless_component(
-    component_name="HERE_GOES_componentName"
-    , class_name="HERE_GOES_className"
-    , props="HERE_GOES_props"
-    , prop_types="HERE_GOES_proptypes"
-)
+output = create_stateless_component({
+      'component_name': "HERE_GOES_componentName"
+    , 'class_name':     "HERE_GOES_className"
+    , 'props':          "HERE_GOES_props"
+    , 'prop_types':     "HERE_GOES_proptypes"
+})
 print(output)
