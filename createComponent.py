@@ -117,7 +117,7 @@ def prop_types_and_export(param):
 def create_class_component(param):
     return \
     create_template(
-    header=imports(param)
+      header=imports(param)
     , body=component(param)
     , footer=prop_types_and_export(param)
 )
@@ -125,15 +125,6 @@ def create_class_component(param):
 
 def create_pure_component(param):
     param["component_type"] = "PureComponent"
-    return \
-    create_template(
-          header=imports(param)
-        , body=component(param)
-        , footer=prop_types_and_export(param)
-    )
-
-def create_standard_component(param):
-    param["component_type"] = "Component"
     return \
     create_template(
           header=imports(param)
