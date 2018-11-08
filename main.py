@@ -149,19 +149,6 @@ def create_stateless_component(param):
         , footer=prop_types_and_export(param)
     )
 
-def create_component(
-        component_name
-        , class_name
-        , props
-        , prop_types
-): return \
-    create_class_component(
-    component_name=component_name
-    , class_name=class_name
-    , props=props
-    , prop_types=prop_types
-    , component_type="Component"
-)
 
 
 output = create_stateless_component({
